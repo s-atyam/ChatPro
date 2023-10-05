@@ -1,5 +1,6 @@
 import React from 'react'
 import logo_dp from '../images/logo.png'
+import { Link } from 'react-router-dom'
 
 const Login = () => {
   return (
@@ -30,11 +31,11 @@ const Login = () => {
                 </div>
             </div>
             <div className='w-11/12 h-fit flex justify-center  flex-wrap mt-10 '>
-                <button className=' border outline-none text-sm font-semibold px-16 md:px-12 py-2 rounded-sm mx-auto hover:bg-slate-800 border-slate-300 text-slate-300'>Back</button>
+                <Link to='/' className=' border outline-none text-sm font-semibold px-16 md:px-12 py-2 rounded-sm mx-auto hover:bg-slate-800 border-slate-300 text-slate-300'>Back</Link>
                 <button className=' border outline-none text-sm font-semibold px-16 md:px-12 py-2 rounded-sm mx-auto hover:bg-slate-800 border-blue-600 text-blue-600'>Submit</button>
             </div>
         </form>
-        <p className='font-semibold text-sm mt-10'>New to ChatPro? <span className='text-blue-600 cursor-pointer'>Signup</span></p>
+        <p className='font-semibold text-sm mt-10'>New to ChatPro? <Link to='/signup' className='text-blue-600 cursor-pointer'>Signup</Link></p>
     </div>
   )
 }
