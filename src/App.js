@@ -1,14 +1,10 @@
 import React from "react";
-import Navbar from "./components/Navbar/navbar";
-import Body from "./components/Body/body";
-import Footer from "./components/Footer/footer";
+// import Homepage from "./components/Home/homepage";
+import Signup from "./components/Signup/signup";
 
 export default function App() {
   return (
-    <div className="w-screen h-screen bg-slate-900 flex flex-col">
-    <Navbar/>
-    <Body/>
-    <Footer/>
-    </div>
+    // <Homepage/>
+    <Signup/>
   )
 }
