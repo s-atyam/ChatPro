@@ -6,8 +6,11 @@ const Chat = () => {
         <div className='h-4/5 aspect-square border border-slate-600 my-1'></div>
         <div className='flex w-full justify-center items-center flex-col h-5/6 mx-2'>
             <div className='w-full h-fit flex justify-between mx-2'>
-                <h1 className='text-sm'>Full Name</h1>
-                <h1 className='text-[11px] text-slate-500'>25 Mar 2023 - 9:00 PM</h1>
+                <div className='flex w-2/3 justify-between'>
+                    <h1 className='text-sm'>Full Name</h1>
+                    <p className='text-green-500 text-[10px] font-bold'>Online</p>
+                </div>
+                <h1 className='text-[11px] text-slate-500 font-medium'>25 Mar 2023 - 9:00 PM</h1>
             </div>
             <div className='w-full h-fit flex justify-between mx-2'>
                 <p className='w-full mx-2 text-xs flex text-slate-500'>Some random text message... </p>
