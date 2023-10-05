@@ -1,10 +1,14 @@
 import React from "react";
-// import Homepage from "./components/Home/homepage";
-import Signup from "./components/Signup/signup";
+// import Login from "./components/Login/login";
+import Homepage from "./components/Home/homepage";
+// import Signup from "./components/Signup/signup";
 
 export default function App() {
   return (
-    // <Homepage/>
-    <Signup/>
+    <>
+      <Homepage/>
+      {/* <Signup/> */}
+      {/* <Login/> */}
+    </>
   )
 }
