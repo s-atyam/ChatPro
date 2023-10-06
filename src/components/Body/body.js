@@ -5,7 +5,7 @@ const Body = () => {
   return (
     <div className='bg-slate-900 text-slate-400 w-screen h-screen flex justify-center items-center'>
 
-      <div className='w-60 h-full border-r border-slate-700 flex flex-col justify-around items-center'>
+      <div className='min-w-[15rem] h-full border-r border-slate-700 flex flex-col justify-around items-center'>
         <div className='w-5/6 h-fit flex justify-center flex-wrap'>
           <button className='w-5/6 h-10 border border-slate-700 rounded-sm'>Logo</button>
         </div>
@@ -42,7 +42,7 @@ const Body = () => {
           </div>
         
           {/* <div className='w-[70%] h-full flex justify-center items-center'>No new messages</div> */}
-          <div className='w-[70%] h-full flex flex-col justify-between items-center'>
+          <div className='w-[70%] flex-grow h-full flex flex-col justify-between items-center'>
             <div className='flex items-center w-full border-b border-slate-700 h-14'>
               <div className=' h-2/3 aspect-square border border-slate-700 ml-2'></div>
               <div className=' h-5/6 w-fit ml-2'>
@@ -55,7 +55,7 @@ const Body = () => {
                 <div className='h-full mx-1 flex justify-center items-center aspect-square border border-slate-700'>3</div>
               </div>
             </div>
-            <div className='h-3/4 max-h-[32rem] w-[96%] max-w-4xl my-5 border border-slate-700 p-2'>
+            <div className='h-3/4 max-h-[40rem] flex-grow w-[96%] max-w-6xl my-5 border border-slate-700 p-2'>
               <Messages direction="left"/>
               <Messages direction="right"/>
               <Messages direction="left"/>

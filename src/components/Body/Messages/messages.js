@@ -6,7 +6,6 @@ const Messages = (props) => {
       <p className=''>This random sample message</p>
       <p className={`w-fit h-fit ml-auto text-[11px] ${props.direction==='left'?'text-slate-600':'text-slate-500'}`}>25 Mar 2023 - 9:00 PM</p>
     </div>
-
   )
 }
 
