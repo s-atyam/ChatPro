@@ -1,4 +1,4 @@
 const express = require('express')
-const mongoose = require('mongoose')
+const connectDB = require('./src/db/config/db.config');
 
-mongoose.connect('mongodb://localhost:27017/ChatPro')
+connectDB();
