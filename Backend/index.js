@@ -8,6 +8,7 @@ const app = express();
 app.use(express.json());
 
 app.use('/auth',require('./src/routes/userauth'))
+app.use('/profile',require('./src/routes/userprofile'))
 
 app.listen(PORT,(e)=>{
     if(e){

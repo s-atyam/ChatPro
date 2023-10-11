@@ -16,4 +16,23 @@ router.post('/signup',async (req,res)=>{
     }
 })
 
+// to login existing user
+router.get('/login', async (req,res)=>{
+    console.log(req.body);
+    try{
+        const data = await user.find({email:req.body.email});
+        if(data.length===1){
+            if(data[0].pass===req.body.pass){
+                res.send("Logged in!");
+            }else{
+                res.send("Invalid email or password");
+            }
+        }else{
+            res.send("Invalid email or password");
+        }
+    }catch(e){
+        console.log("Error : ",e.message);
+    }
+})
+
 module.exports = router;
