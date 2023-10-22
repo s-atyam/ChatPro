@@ -7,9 +7,16 @@ const user = require('../db/schema/user')
 router.post('/signup',async (req,res)=>{
     console.log(req.body);
     try{
-        const newUser = new user(req.body);
-        await newUser.save()
-        res.sendStatus(200);
+        const data = await user.find({email:req.body.email});
+        if(data.length>0){
+            console.log("invalid")
+            res.send({})
+        }else{
+            const newUser = new user(req.body);
+            await newUser.save()
+            const newData = await user.find({email:req.body.email});
+            res.send(newData[0]);
+        }
     }catch(e){
         console.log("Error : ",e.message)
         res.sendStatus(500);
@@ -18,17 +25,18 @@ router.post('/signup',async (req,res)=>{
 
 // to login existing user
 router.get('/login', async (req,res)=>{
-    console.log(req.body);
     try{
-        const data = await user.find({email:req.body.email});
+        const data = await user.find({email:req.headers.userid});
         if(data.length===1){
-            if(data[0].pass===req.body.pass){
-                res.send("Logged in!");
+            if(data[0].pass===req.headers.pass){
+                res.send(data[0]);
             }else{
-                res.send("Invalid email or password");
+                // res.send({'user':'dbjshgdsjh'}); 
+                res.send({});
             }
         }else{
-            res.send("Invalid email or password");
+            res.send({}); 
+            // res.send("Invalid email or password");
         }
     }catch(e){
         console.log("Error : ",e.message);

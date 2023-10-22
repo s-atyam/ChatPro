@@ -42,7 +42,7 @@ const Homepage = () => {
           </Link>
         </div>
       </div>
-      <navbar className="text-slate-400 md:text-lg font-semibold w-full flex items-center justify-center flex-grow ">
+      <div className="text-slate-400 md:text-lg font-semibold w-full flex items-center justify-center flex-grow ">
         <span className="mr-3 text-sm">Contact</span>
         <span className="mr-3 ">.</span>
         <span className="mr-3 text-sm">Feedback</span>
@@ -53,7 +53,7 @@ const Homepage = () => {
         </span>
         <span className="mr-3 ">.</span>
         <span className="mr-3 text-sm">About us</span>
-      </navbar>
+      </div>
     </div>
   );
 };
