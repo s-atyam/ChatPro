@@ -11,7 +11,7 @@ import userContext from "../../context/userContext";
 
 
 const connectWithSocket = (data) =>{
-  const s = io('http://192.168.100.3:5000',{
+  const s = io('http://192.168.100.5:5000',{
     autoConnect: false,
     query: { userid:data }
   });
@@ -26,12 +26,12 @@ const Body = () => {
   
   const navigate = useNavigate();
   const context = useContext(userContext);
-  const { userData, searchUser } = context;
+  const { userData, searchUser, searchFriends } = context;
   
   let arrayInitial = [];
   const [text, setText] = useState('');
   const [search, setSearch] = useState('');
-  const [currUser, setCurrUser] = useState({"_id":"","name":"User","status":true,"lastActive":Date.now()});
+  const [currUser, setCurrUser] = useState({"_id":"","name":"User","status":true,"lastActive":Date.now(),"isFriend":false});
   const [usersArray,setUsersArray] = useState(arrayInitial);
   const [msgArray,setMsgArray] = useState(arrayInitial);
 
@@ -43,8 +43,10 @@ const Body = () => {
 
   const handleSend = (e)=>{
     e.preventDefault();
-    setMsgArray([...msgArray,{'text':text,'time':Date.now(),'dir':'right'}]);
-    socketRef.current.emit('send_message',text,currUser._id);
+    const dateObj = new Date();
+    setMsgArray([...msgArray,{'text':text,'time':dateObj.toString().substring(0,21),'dir':'right'}]);
+    socketRef.current.emit('send_message',text,currUser._id,currUser.isFriend);
+    console.log(Date.now().toString())
     setText('');
   }
   
@@ -59,28 +61,41 @@ const Body = () => {
   const handleSearchClick = async (e) => {
     e.preventDefault();
     if(search.length!==0){
-      const searchedUser = await searchUser(search);
+      const searchedUser = await searchUser(search,userData._id);
       setSearch('');
       setUsersArray(searchedUser.data)
     }
   }
 
   const handleNewClick = (data) =>{
-    setCurrUser({"_id":data._id,"name":data.fName+" "+data.lName,"status":false,"lastActive":data.lastModified})
+    let temp = userData.friends.findIndex((e)=>{return e===data._id});
+    if(temp===-1){
+      setCurrUser({"_id":data._id,"name":data.fName+" "+data.lName,"status":true,"lastActive":data.lastModified,"isFriend":false});
+    }else{
+      setCurrUser({"_id":data._id,"name":data.fName+" "+data.lName,"status":true,"lastActive":data.lastModified,"isFriend":true});
+    }
   } 
-
+  
   const handleLogout = ()=>{
     socketRef.current.disconnect();
     navigate('/');
+  }
+  const getFriends = async () =>{
+    const searchedFriends = await searchFriends({fri:userData.friends});
+    console.log(searchedFriends);
+    // setUsersArray(searchedFriends);
   }
 
   useEffect(() => {
     if(Object.keys(userData).length===0){
       navigate('/login');
     }else{
-      if (!hasEffectRun.current) { 
+      if (!hasEffectRun.current) {
+
         hasEffectRun.current = true;
         socketRef.current = connectWithSocket(userData._id);
+
+        getFriends();
           // socket events
         socketRef.current.on("connect", () => {
           console.log(socketRef.current.id);
@@ -89,7 +104,8 @@ const Body = () => {
           console.log("Logout! client side disconnected");
         });
         socketRef.current.on('recv-message',(recivied_msg)=>{
-          setMsgArray([...msgArray,{'text':recivied_msg,'time':Date.now(),'dir':'left'}]);
+          const dateObj = new Date();
+          setMsgArray([...msgArray,{'text':recivied_msg,'time':dateObj.toString().substring(0,21),'dir':'left'}]);
         })
       }
     }

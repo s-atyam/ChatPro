@@ -7,7 +7,7 @@ const chats = new Schema({
     messages : String,
     createdAt : {
         type:Date,
-        default:Date.now
+        default:Date.now()
     },
     status : {
         type:Boolean,

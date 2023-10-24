@@ -15,7 +15,7 @@ const connectDB = require('./src/db/config/db.config');
 connectDB();
 
 const user = require('./src/db/schema/user')
-const msg = require('./src/db/schema/message')
+const msg = require('./src/db/schema/message');
 
 app.use(express.json());
 app.use(cors())
@@ -29,21 +29,26 @@ const user_soc_id = new Map();
 io.on('connection',(socket)=>{
     const customSocketId = socket.handshake.query.userid;
     console.log(`connection from client with id : ${socket.id} and cus id `,customSocketId );
+    
     soc_user_id.set(socket.id,customSocketId);
     user_soc_id.set(customSocketId,socket.id);
-    let status;
-    socket.on('send_message', (text_data,userID)=>{
+    const updatedData = user.findByIdAndUpdate(customSocketId,{status:true})
+    console.log("status : ",updatedData);
+
+    socket.on('send_message', (text_data,userID,isFriend)=>{
         try{
-            console.log(text_data," ",userID);
-            // socket.broadcast.emit('recv-message',text_data);
+            let status = false;
             if(user_soc_id.has(userID)){
                 const sockID = user_soc_id.get(userID);
-                console.log(sockID);
                 socket.to(sockID).emit('recv-message',text_data);
-                status=true;
+                status = true;
             }
             const newMsg = new msg({"senderID":customSocketId,"reciverID":userID,"messages":text_data,"status":status});
             newMsg.save();
+            if(!isFriend){
+                const updatedData = user.findByIdAndUpdate(customSocketId,{ $push: { friends: userID }})
+                console.log("isFriend : ",updatedData," ",isFriend);
+            }
         }catch(e){
             console.log("Error: ",e.message)
         }
@@ -52,7 +57,9 @@ io.on('connection',(socket)=>{
         console.log("User Disconnected with id : ",socket.id);
         try{
             soc_user_id.delete(socket.id);
-            user_soc_id.delete(cusSocID);
+            user_soc_id.delete(customSocketId);
+            const updatedData = user.findByIdAndUpdate(customSocketId,{status:false,lastModified:Date.now()});
+            console.log("Disconnected : ",updatedData);
         }catch(e){
             console.log("Error: ",e.message);
         }

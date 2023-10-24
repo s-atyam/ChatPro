@@ -2,7 +2,7 @@ import React,{ useState } from "react";
 import userContext from "./userContext";
 
 const UserState = (props)=>{
-    const host = 'http://192.168.100.3:5000';
+    const host = 'http://192.168.100.5:5000';
     const userDataInitial = {};
     const userMessagesInitial = [];
 
@@ -48,13 +48,29 @@ const UserState = (props)=>{
         }
     }
 
-    const searchUser = async (userInfo) => {
+    const searchUser = async (userInfo,userID) => {
         try{
             const response = await fetch(`${host}/profile/search`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'username': userInfo
+                    'username': userInfo,
+                    'userid':userID
+                }
+            })
+            const data = await response.json();
+            return data;
+        }catch(e){
+            console.log(e.message)
+        }
+    }
+    const searchFriends = async (friendsArray) => {
+        try{
+            const response = await fetch(`${host}/profile/searchFr`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'friendsIDArray':friendsArray
                 }
             })
             const data = await response.json();
@@ -65,7 +81,7 @@ const UserState = (props)=>{
     }
 
     return (
-        <userContext.Provider value={{ signup, login, searchUser, userData, userMessages, setUserMessages }}>
+        <userContext.Provider value={{ signup, login, searchUser, userData, userMessages, setUserMessages, searchFriends }}>
             {props.children}
         </userContext.Provider>
     )
