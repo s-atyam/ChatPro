@@ -8,7 +8,13 @@ const chats = new Schema({
     createdAt : {
         type:Date,
         default:Date.now
+    },
+    status : {
+        type:Boolean,
+        default:false
     }
 })
+
+chats.index({createdAt:1})
 
 module.exports = mongoose.model('chat',chats);

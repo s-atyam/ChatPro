@@ -31,12 +31,10 @@ router.get('/login', async (req,res)=>{
             if(data[0].pass===req.headers.pass){
                 res.send(data[0]);
             }else{
-                // res.send({'user':'dbjshgdsjh'}); 
                 res.send({});
             }
         }else{
             res.send({}); 
-            // res.send("Invalid email or password");
         }
     }catch(e){
         console.log("Error : ",e.message);

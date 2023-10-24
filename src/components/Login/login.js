@@ -6,7 +6,7 @@ import userContext from '../../context/userContext';
 const Login = () => {
     const context = useContext(userContext);
     const { login } = context;
-
+    
     const navigate = useNavigate();
 
     const [email, setEmail] = useState('');
@@ -35,6 +35,7 @@ const Login = () => {
             return;
         }
         let data = await login({email,password});
+        console.log(data)
         if(Object.keys(data).length===0){
             console.log("Invaid user.")
         }else{
@@ -54,7 +55,7 @@ const Login = () => {
                     <input onChange={handleChangeEmail} className='flex h-10 outline-none bg-transparent border border-slate-700 pl-3 text-md font-medium rounded-sm focus:bg-slate-800' type='email'  />
                 </div>
                 <div className='w-full h-6'>
-                    {flag.email && <p className='text-red-600 text-sm font-medium'>*Email is required</p>}
+                    {flag.email && <p className='text-red-600 text-sm font-medium'>*Valid email is required</p>}
                 </div>
             </div>
             <div className='w-5/6 h-fit flex flex-wrap'>

@@ -40,17 +40,18 @@ const Signup = () => {
         const validPassRegex =  /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,15}$/;
         if(name.fName==''){
             setFlag({...flag,fName:true});
+            return;
         }
         if(!email.match(validEmailRegex)){
             setFlag({...flag,email:true});
+            return;
         }
         if(!password.pass.match(validPassRegex)){
             setFlag({...flag,pass:true});
+            return;
         }
         if(password.pass!==password.confirm){
             setFlag({...flag,confirm:true});
-        }
-        if(flag.fName || flag.email || flag.pass || flag.confirm){
             return;
         }
         

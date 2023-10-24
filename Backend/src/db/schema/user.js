@@ -7,6 +7,10 @@ const userSchema = new Schema({
         required:true
     },
     lName : String,
+    username : {
+        type:String,
+        require:true
+    },
     email : {
         type:String,
         required:true,
@@ -26,5 +30,7 @@ const userSchema = new Schema({
         required:true
     }
 })
+
+userSchema.index({username:'text'})
 
 module.exports = mongoose.model('user',userSchema);
