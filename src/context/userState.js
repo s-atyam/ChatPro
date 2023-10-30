@@ -2,7 +2,7 @@ import React,{ useState } from "react";
 import userContext from "./userContext";
 
 const UserState = (props)=>{
-    const host = 'http://192.168.100.5:5000';
+    const host = 'http://192.168.119.231:5000';
     const userDataInitial = {};
     const userMessagesInitial = [];
 
@@ -64,17 +64,20 @@ const UserState = (props)=>{
             console.log(e.message)
         }
     }
-    const searchFriends = async (friendsArray) => {
+    const searchFriends = async (userId) => {
         try{
+            // console.log(friendsArray)
             const response = await fetch(`${host}/profile/searchFr`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'friendsIDArray':friendsArray
+                    'userid':userId
                 }
             })
-            const data = await response.json();
-            return data;
+            const dat = await response.json();
+            // console.log()
+            // console.log(dat)
+            return JSON.parse(dat.data);
         }catch(e){
             console.log(e.message)
         }

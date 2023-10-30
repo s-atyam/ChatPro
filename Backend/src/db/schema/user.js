@@ -18,11 +18,11 @@ const userSchema = new Schema({
     },
     createdAt : {
         type:Date,
-        default:Date.now()
+        default:Date.now
     },
     lastModified : {
         type:Date,
-        default:Date.now()
+        default:Date.now
     },
     friends : [mongoose.Schema.Types.ObjectId],
     pass : {

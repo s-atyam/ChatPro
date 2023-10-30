@@ -38,7 +38,7 @@ const Signup = () => {
         e.preventDefault();
         const validEmailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
         const validPassRegex =  /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,15}$/;
-        if(name.fName==''){
+        if(name.fName===''){
             setFlag({...flag,fName:true});
             return;
         }

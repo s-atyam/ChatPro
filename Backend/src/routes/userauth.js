@@ -5,11 +5,9 @@ const user = require('../db/schema/user')
 
 // to create new user (signup)
 router.post('/signup',async (req,res)=>{
-    console.log(req.body);
     try{
         const data = await user.find({email:req.body.email});
         if(data.length>0){
-            console.log("invalid")
             res.send({})
         }else{
             const newUser = new user(req.body);
