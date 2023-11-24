@@ -62,7 +62,7 @@ io.on('connection', async (socket)=>{
                     // console.log("isFriend : ",updatedData," ",isFriend);
                 }
             }else{
-                writeFile("/Users/satya/Downloads/temp.jpg", text_data, (err) => {
+                writeFile("/home/user/temp.jpg", text_data, (err) => {
                     if(err){
                       console.log("error: ",err.message)
                     }

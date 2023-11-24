@@ -12,7 +12,7 @@ import Peer from 'simple-peer';
 
 
 const connectWithSocket = (data) =>{
-  const s = io('http://192.168.119.231:5000',{
+  const s = io('http://192.168.100.9:5000',{
     autoConnect: false,
     query: { userid:data }
   });
@@ -96,10 +96,11 @@ const Body = () => {
   const handleNewClick = (data) =>{
     let temp = userData.friends.findIndex((e)=>{return e===data._id});
     if(temp===-1){
-      setCurrUser({"_id":data._id,"name":data.fName+" "+data.lName,"status":true,"lastActive":data.lastModified,"isFriend":false});
+      setCurrUser({"_id":data._id,"name":data.fName+" "+data.lName,"status":data.status,"lastActive":data.lastModified,"isFriend":false});
     }else{
-      setCurrUser({"_id":data._id,"name":data.fName+" "+data.lName,"status":true,"lastActive":data.lastModified,"isFriend":true});
+      setCurrUser({"_id":data._id,"name":data.fName+" "+data.lName,"status":data.status,"lastActive":data.lastModified,"isFriend":true});
     }
+    console.log(currUser)
   } 
   
   const handleLogout = ()=>{
@@ -215,6 +216,15 @@ const Body = () => {
         })
         socketRef.current.on("status_on_conn", (userid) => {
           console.log("status update of user ", userid)
+          setCurrUser(prevCurrUser => {        
+            if (prevCurrUser._id === userid) {
+              return {
+                ...prevCurrUser,
+                'status': true,
+              };
+            }
+            return prevCurrUser;
+          });
           setUsersArray((usersArray)=>{
             return usersArray.map((item)=>{
               if(item._id===userid){
@@ -227,6 +237,16 @@ const Body = () => {
         });
         socketRef.current.on("status_on_dis", (userid) => {
           console.log("status update of user ", userid)
+          setCurrUser(prevCurrUser => {        
+            if (prevCurrUser._id === userid) {
+              return {
+                ...prevCurrUser,
+                'status': false,
+              };
+            }
+            return prevCurrUser;
+          });
+          console.log(currUser);
           setUsersArray((usersArray)=>{
             return usersArray.map((item)=>{
               if(item._id===userid){

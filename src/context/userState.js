@@ -2,7 +2,7 @@ import React,{ useState } from "react";
 import userContext from "./userContext";
 
 const UserState = (props)=>{
-    const host = 'http://192.168.119.231:5000';
+    const host = 'http://192.168.100.9:5000';
     const userDataInitial = {};
     const userMessagesInitial = [];
 
