@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const { Schema } = mongoose;
 
+// this schema is for message
 const chats = new Schema({
     senderID : mongoose.Schema.Types.ObjectId,
     reciverID : mongoose.Schema.Types.ObjectId,

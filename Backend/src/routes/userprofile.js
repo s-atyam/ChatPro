@@ -3,6 +3,7 @@ const router = express.Router();
 
 const user = require('../db/schema/user')
 
+// this route is for searching the user in the database, given the username or initials 
 router.get('/search', async (req,res)=>{
     try{
         const searchPattern = new RegExp(req.headers.username, 'i');
@@ -13,6 +14,7 @@ router.get('/search', async (req,res)=>{
     }
 })
 
+// this route is for getting all the friends of the given userID 
 router.get('/searchFr', async (req,res)=>{
     try{
         const data = [];
@@ -28,6 +30,7 @@ router.get('/searchFr', async (req,res)=>{
     }
 })
 
+// this route is to get the chat history of all the friends of the given userID
 router.get('/chathistory', async (req,res)=>{e})
-
+    // TODO : complete this route
 module.exports = router;
