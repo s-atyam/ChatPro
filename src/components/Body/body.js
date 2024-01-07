@@ -10,7 +10,7 @@ import { io } from "socket.io-client";
 import userContext from "../../context/userContext";
 
 const connectWithSocket = (data) =>{
-  const s = io(process.env.SERVER_LINK,{
+  const s = io(process.env.REACT_APP_SERVER_LINK,{
     autoConnect: false,
     query: { userid:data }
   });
@@ -51,7 +51,7 @@ const Body = () => {
     }
     isTyping();
   }
-
+  // for selecting the file
   const handleFileSelected = (event) => {
     event.preventDefault();
     const selectedFile = event.target.files[0];
@@ -59,6 +59,7 @@ const Body = () => {
     socketRef.current.emit('send_message',selectedFile,currUser._id,currUser.isFriend,true);
   };
 
+  // this function if for delaying after an event end (used in tying status)
   const debounce = (callback,delay=1000)=>{
     let timeout;
     return (...args)=>{
@@ -66,13 +67,14 @@ const Body = () => {
       timeout = setTimeout(()=>{callback(...args)},delay);
     }
   }
-
+  // used in typing status
   const isTyping = debounce(()=>{
     console.log("event");
     socketRef.current.emit('eTyping',currUser._id);
     setTyping1(false);
   },1500)
 
+  // to send the message
   const handleSend = (e)=>{
     e.preventDefault();
     if(text){
@@ -81,7 +83,7 @@ const Body = () => {
     setText('');
     }
   }
-  
+  // TODO
   const handleMicClick = (e)=>{
     e.preventDefault();
   }
@@ -90,6 +92,7 @@ const Body = () => {
     setSearch(e.target.value);
   }
 
+  // for searching the user
   const handleSearchClick = async (e) => {
     e.preventDefault();
     if(search.length!==0){
@@ -99,6 +102,7 @@ const Body = () => {
     }
   }
 
+  // for selecting the desire user for chatting
   const handleNewClick = (data) =>{
     let temp = userData.friends.findIndex((e)=>{return e===data._id});
     if(temp===-1){
@@ -111,13 +115,14 @@ const Body = () => {
     setShowChatArea(true);
   } 
   
+  // logout functionality
   const handleLogout = ()=>{
     socketRef.current.emit('dis_status');
     socketRef.current.disconnect();
     localStorage.removeItem('chatpro_auth_token');
     navigate('/');
   }
-
+  // to serach for friends
   const getFriends = async () =>{
     // console.log(userData)
     const searchedFriends = await searchFriends(userData._id);
@@ -262,14 +267,14 @@ const Body = () => {
       {/* left bar becomes top bar */}
       <div className="h-14 w-full flex justify-between md:hidden border border-slate-500">
         <div className="h-full w-fit flex items-center">
-          {showChatArea && <FaArrowCircleLeft onClick={()=>{setShowChatArea(false)}} className={`mx-${showChatArea?5:10} text-xl cursor-pointer`}/>}
-          <AiOutlineProfile className={`mx-${showChatArea?5:6} text-xl text-yellow-500`}/>
-          <FaUserSecret className={`mx-${showChatArea?5:6} text-xl text-blue-500`}/>
-          <FaUserFriends onClick={getFriends} className={`mx-${showChatArea?3:6} text-xl text-gren-500 cursor-pointer`}/>
+          {showChatArea && <FaArrowCircleLeft onClick={()=>{setShowChatArea(false)}} className={`mx-2 mx-${showChatArea?5:10} text-xl cursor-pointer`}/>}
+          <AiOutlineProfile className={`mx-2 mx-${showChatArea?'5':'6'} text-xl text-yellow-500`}/>
+          <FaUserSecret className={`mx-2 mx-${showChatArea?5:6} text-xl text-blue-500`}/>
+          <FaUserFriends onClick={getFriends} className={`mx-2 mx-${showChatArea?3:6} text-xl text-gren-500 cursor-pointer`}/>
         </div>
         <div className="h-full w-fit flex items-center">
-          <BsGearWideConnected className={`mx-${showChatArea?5:6} text-xl text-gray-500`}/>
-          <BsBoxArrowInRight onClick={handleLogout} className={`mx-${showChatArea?5:6} text-xl text-red-500 cursor-pointer`}/>
+          <BsGearWideConnected className={`mx-2 mx-${showChatArea?5:6} text-xl text-gray-500`}/>
+          <BsBoxArrowInRight onClick={handleLogout} className={`mx-2 mx-${showChatArea?5:6} text-xl text-red-500 cursor-pointer`}/>
         </div>
       </div>
 
@@ -297,7 +302,7 @@ const Body = () => {
             {
               usersArray.map((data)=>{
                 return <Chat clickFunction={()=>{handleNewClick(data)}} key={data._id} name={`${data.fName} ${data.lName}`} status={data.status} lastOnline={data.lastModified}  />
-              })
+              })  
             }
           </div>}
         

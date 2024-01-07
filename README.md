@@ -28,7 +28,7 @@ Configure the server by creating a .env file in the server directory with the fo
 `JWT_SECRET=''`   // write your Secret
 
 Also on client side create a .env file and a variable:
-`SERVER_LINK=''`  // example http://localhost:5000
+`REACT_APP_SERVER_LINK=''`  // example http://localhost:5000
 
 
 ## Running the Application

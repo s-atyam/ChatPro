@@ -26,7 +26,7 @@ router.post('/signup',async (req,res)=>{
             res.send({authToken});
         }
     }catch(e){
-        console.log("Error : ",e.message)
+        console.log("Error : ",e)
     }
 })
 

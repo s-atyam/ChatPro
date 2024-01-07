@@ -4,7 +4,7 @@ import userContext from "./userContext";
 // the userstate context
 const UserState = (props)=>{
     // the server endpoint
-    const host = process.env.SERVER_LINK;
+    const host = process.env.REACT_APP_SERVER_LINK;
    
     const userDataInitial = {};
     const userMessagesInitial = [];
