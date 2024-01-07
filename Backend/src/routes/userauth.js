@@ -4,7 +4,7 @@ const user = require('../db/schema/user')
 
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const JWT_SCERET = process.env.JWT_SCERET;
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // to create new user (signup)
 router.post('/signup',async (req,res)=>{
@@ -22,7 +22,7 @@ router.post('/signup',async (req,res)=>{
 
             const existUser = await user.findOne({email:req.body.email})
 
-            const authToken = jwt.sign({ID:existUser._id},JWT_SCERET);
+            const authToken = jwt.sign({ID:existUser._id},JWT_SECRET);
             res.send({authToken});
         }
     }catch(e){
@@ -43,7 +43,7 @@ router.post('/login', async (req,res)=>{
           res.send({error:'Wrong credencials'});
           return;
         }
-        const authToken = jwt.sign({ID:existUser._id},JWT_SCERET);
+        const authToken = jwt.sign({ID:existUser._id},JWT_SECRET);
         res.send({authToken});
     }catch(e){
         console.log("Error : ",e.message);

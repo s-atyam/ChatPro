@@ -10,7 +10,7 @@ import { io } from "socket.io-client";
 import userContext from "../../context/userContext";
 
 const connectWithSocket = (data) =>{
-  const s = io('http://192.168.45.231:5000',{
+  const s = io(process.env.SERVER_LINK,{
     autoConnect: false,
     query: { userid:data }
   });

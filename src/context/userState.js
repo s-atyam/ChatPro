@@ -4,7 +4,7 @@ import userContext from "./userContext";
 // the userstate context
 const UserState = (props)=>{
     // the server endpoint
-    const host = 'http://192.168.45.231:5000';
+    const host = process.env.SERVER_LINK;
    
     const userDataInitial = {};
     const userMessagesInitial = [];
