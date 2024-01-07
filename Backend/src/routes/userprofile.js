@@ -1,7 +1,18 @@
 const express = require('express')
 const router = express.Router();
 
+const fetchuser = require('../middleware/fetchUser')
 const user = require('../db/schema/user')
+
+// this route is for user data from the database, given the auth token 
+router.get('/getUserData',fetchuser, async (req,res)=>{
+    try{
+        const data = await user.findOne({_id:req.userID}).select('-pass');
+        res.send(data);
+    }catch(e){
+        console.log("Error : ",e.message);
+    }
+})
 
 // this route is for searching the user in the database, given the username or initials 
 router.get('/search', async (req,res)=>{

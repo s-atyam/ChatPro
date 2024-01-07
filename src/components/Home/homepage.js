@@ -4,13 +4,16 @@ import logo_dp from '../images/logo.png'
 import { Link } from "react-router-dom";
 
 const Homepage = () => {
+  
   return (
-    <div className="w-screen h-screen bg-slate-900 flex flex-col">
+    <div className="w-screen h-screen bg-slate-900 flex flex-col justify-between">
+     
+      {/* navbar */}
       <div className="h-fit w-full flex  justify-around items-center mt-5 overflow-hidden">
         <div className="w-1/3 flex md:w-[12%]  md:mr-12">
           <img src={logo_dp} alt="" />
         </div>
-        <div className="w-fit flex">
+        <div className="w-fit flex py-2">
           <Link to='/signup' className="border-2 font-medium text-lg border-blue-500 text-blue-500 mx-2 px-4 py-1 rounded-sm hover:text-blue-900 hover:border-blue-900">
             Signup
           </Link>
@@ -19,7 +22,9 @@ const Homepage = () => {
           </Link>
         </div>
       </div>
-      <div className="text-slate-400 w-full h-fit md:h-5/6 mb-36 md:mb-0 flex justify-center items-center flex-wrap">
+
+      {/* info */}
+      <div className="text-slate-400 w-full h-3/4 md:h-5/6 flex justify-center items-center flex-wrap">
         <div className="h-1/3 flex md:h-1/2 md:mr-12">
           <img src={img_dp} alt="" className="mx-auto" />
         </div>
@@ -42,17 +47,19 @@ const Homepage = () => {
           </Link>
         </div>
       </div>
-      <div className="text-slate-400 md:text-lg font-semibold w-full flex items-center justify-center flex-grow ">
-        <span className="mr-3 text-sm">Contact</span>
-        <span className="mr-3 ">.</span>
-        <span className="mr-3 text-sm">Feedback</span>
-        <span className="mr-3 ">.</span>
-        <span className="mr-3 text-sm text-blue-700">
+
+      {/* footer */}
+      <div className="text-slate-400 md:text-lg mb-4 font-semibold w-full flex items-center justify-center flex-wrap">
+        <span className="mx-1 text-sm">Contact</span>
+        {/* <span className="mr-3 ">.</span> */}
+        <span className="mx-1 text-sm">Feedback</span>
+        {/* <span className="mr-3 ">.</span> */}
+        <span className="mx-1 text-sm text-blue-700">
           Terms of Service <span className="text-slate-400">and</span> Privacy
           Policy
         </span>
-        <span className="mr-3 ">.</span>
-        <span className="mr-3 text-sm">About us</span>
+        {/* <span className="mr-3 ">.</span> */}
+        <span className="mx-1 text-sm">About us</span>
       </div>
     </div>
   );

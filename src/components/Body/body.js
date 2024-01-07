@@ -1,5 +1,5 @@
 import { BsThreeDots, BsFillCameraVideoFill, BsFillTelephoneFill, BsSearch, BsFillMicFill, BsSend, BsPaperclip, BsGearWideConnected, BsBoxArrowInRight } from "react-icons/bs";
-import { FaUserAlt, FaUserSecret, FaUserFriends } from "react-icons/fa";
+import { FaUserAlt, FaUserSecret, FaUserFriends, FaArrowCircleLeft } from "react-icons/fa";
 import { AiOutlineProfile } from "react-icons/ai";
 import React, { useState, useEffect, useContext, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -8,11 +8,9 @@ import Chat from './Chat/chat';
 import Messages from './Messages/messages';
 import { io } from "socket.io-client";
 import userContext from "../../context/userContext";
-import Peer from 'simple-peer';
-
 
 const connectWithSocket = (data) =>{
-  const s = io('http://192.168.100.9:5000',{
+  const s = io('http://192.168.45.231:5000',{
     autoConnect: false,
     query: { userid:data }
   });
@@ -21,7 +19,7 @@ const connectWithSocket = (data) =>{
 }
 
 const Body = () => {
-
+  
   const socketRef = useRef(null);
   const hasEffectRun = useRef(false);
   const chatContainerRef = useRef(null);
@@ -29,7 +27,7 @@ const Body = () => {
   
   const navigate = useNavigate();
   const context = useContext(userContext);
-  const { userData, searchUser, searchFriends } = context;
+  const { userData, searchUser, searchFriends, getUserData, setToken } = context;
   
   let arrayInitial = [];
   const [text, setText] = useState('');
@@ -38,27 +36,21 @@ const Body = () => {
   const [usersArray,setUsersArray] = useState(arrayInitial);
   const [msgArray,setMsgArray] = useState(arrayInitial);
   const [imgURL,setImgURL] = useState('');
-
-  const [stream,setStream] = useState()
-  const [ receivingCall, setReceivingCall ] = useState(false)
-	const [ callerSignal, setCallerSignal ] = useState()
-	const [ callAccepted, setCallAccepted ] = useState(false)
-	const [ callEnded, setCallEnded] = useState(false)
-	const [ name, setName ] = useState("")
-	const myVideo = useRef()
-	const userVideo = useRef()
-	const connectionRef= useRef()
+  const [typing1,setTyping1] = useState(false);
+  const [typing2,setTyping2] = useState(false);
+  const [showChatArea,setShowChatArea] = useState(window.innerWidth>640?true:false);
+  const [desktopView,setDesktopView] = useState(window.innerWidth>1024?true:false);
 
 
   // various functions for handling the onChange and onClick effect
   const handleOnChange = (e)=>{
     setText(e.target.value);
+    if(!typing1){
+      socketRef.current.emit('sTyping',currUser._id);
+      setTyping1(true);
+    }
+    isTyping();
   }
-
-  const handleFileInputChange = (e) => {
-    e.preventDefault();
-    fileInputRef.current.click();
-  };
 
   const handleFileSelected = (event) => {
     event.preventDefault();
@@ -66,6 +58,20 @@ const Body = () => {
     console.log(selectedFile);
     socketRef.current.emit('send_message',selectedFile,currUser._id,currUser.isFriend,true);
   };
+
+  const debounce = (callback,delay=1000)=>{
+    let timeout;
+    return (...args)=>{
+      clearTimeout(timeout)
+      timeout = setTimeout(()=>{callback(...args)},delay);
+    }
+  }
+
+  const isTyping = debounce(()=>{
+    console.log("event");
+    socketRef.current.emit('eTyping',currUser._id);
+    setTyping1(false);
+  },1500)
 
   const handleSend = (e)=>{
     e.preventDefault();
@@ -101,11 +107,14 @@ const Body = () => {
       setCurrUser({"_id":data._id,"name":data.fName+" "+data.lName,"status":data.status,"lastActive":data.lastModified,"isFriend":true});
     }
     console.log(currUser)
+    setMsgArray([]);
+    setShowChatArea(true);
   } 
   
   const handleLogout = ()=>{
     socketRef.current.emit('dis_status');
     socketRef.current.disconnect();
+    localStorage.removeItem('chatpro_auth_token');
     navigate('/');
   }
 
@@ -122,56 +131,6 @@ const Body = () => {
     }
   };
 
-  const handleVideoCall = () => {
-    navigator.mediaDevices.getUserMedia({ video: true, audio: true }).then((stream) => {
-      setStream(stream)
-      myVideo.current.srcObject = stream
-    })
-    const peer = new Peer({
-			initiator: true,
-			trickle: false,
-			stream: stream
-		})
-
-    peer.on("signal", (data) => {
-			socketRef.current.emit("callUser", {
-				userid: currUser._id,
-				signalData: data,
-				name: userData.fName+" "+userData.lName
-			})
-		})
-		peer.on("stream", (stream) => {
-			userVideo.current.srcObject = stream
-		})
-    socketRef.current.on("callAccepted", (signal) => {
-			setCallAccepted(true)
-			peer.signal(signal)
-		})
-		connectionRef.current = peer
-  }
-  const answerCall =() =>  {
-		setCallAccepted(true)
-		const peer = new Peer({
-			initiator: false,
-			trickle: false,
-			stream: stream
-		})
-		peer.on("signal", (data) => {
-			socketRef.current.emit("answerCall", { signal: data, userid: currUser._id })
-		})
-		peer.on("stream", (stream) => {
-			userVideo.current.srcObject = stream
-		})
-
-		peer.signal(callerSignal)
-		connectionRef.current = peer
-	}
-
-	const leaveCall = () => {
-		setCallEnded(true)
-		connectionRef.current.destroy()
-	}
-
   useEffect(() => {
     scrollToBottom();
   }, [msgArray]);
@@ -182,18 +141,34 @@ const Body = () => {
     }else{
       if (!hasEffectRun.current) {
         
-
         hasEffectRun.current = true;
         socketRef.current = connectWithSocket(userData._id);
 
         getFriends();
-          // socket events
+
+        // socket events
+        
+        // event on connection
         socketRef.current.on("connect", () => {
           console.log(socketRef.current.id);
         });
+        
+        // event on disconnection
         socketRef.current.on("disconnect", () => {
           console.log("Logout! client side disconnected");
         });
+        
+        // typing status turn to true 
+        socketRef.current.on('typingS',()=>{
+          setTyping2(true);
+        })
+        
+        // typing status turn to false 
+        socketRef.current.on('typingE',()=>{
+          setTyping2(false);
+        })
+
+        // event on reciving messages
         socketRef.current.on('recv-message',(received_msg,isFile)=>{
           console.log(received_msg);
           if(isFile){
@@ -211,9 +186,10 @@ const Body = () => {
               { 'text': received_msg, 'time': Date.now(), 'dir': 'left' },
             ]);
           }
-          
           console.log(msgArray);
         })
+
+        // when a friends get online , then changing status
         socketRef.current.on("status_on_conn", (userid) => {
           console.log("status update of user ", userid)
           setCurrUser(prevCurrUser => {        
@@ -235,6 +211,8 @@ const Body = () => {
             })
           })
         });
+        
+        // when a friends get offline , then changing status
         socketRef.current.on("status_on_dis", (userid) => {
           console.log("status update of user ", userid)
           setCurrUser(prevCurrUser => {        
@@ -257,11 +235,6 @@ const Body = () => {
             })
           })
         });
-        socketRef.current.on("callUser", (data) => {
-          setReceivingCall(true)
-          setName(data.name)
-          setCallerSignal(data.signal)
-        })
       }
     }
     // eslint-disable-next-line
@@ -269,9 +242,9 @@ const Body = () => {
   
 
   return (
-    <div className='bg-slate-900 text-slate-400 w-screen h-screen flex justify-center items-center'>
-
-      <div className='min-w-[15rem] w-52 h-full border-r border-slate-700 flex flex-col justify-around items-center'>
+    <div className='bg-slate-900 text-slate-400 w-screen h-screen flex justify-center items-center flex-col md:flex-row'>
+      {/* left bar */}
+      <div className='min-w-[15rem] w-52 h-full border-r border-slate-700 md:flex hidden flex-col justify-around items-center'>
         <div className='w-full h-fit flex justify-center flex-wrap'>
           <img src={logo_dp} alt="" />
         </div>
@@ -286,68 +259,70 @@ const Body = () => {
         </div>
       </div>
 
-      <div className='h-full flex flex-grow flex-col '>
+      {/* left bar becomes top bar */}
+      <div className="h-14 w-full flex justify-between md:hidden border border-slate-500">
+        <div className="h-full w-fit flex items-center">
+          {showChatArea && <FaArrowCircleLeft onClick={()=>{setShowChatArea(false)}} className={`mx-${showChatArea?5:10} text-xl cursor-pointer`}/>}
+          <AiOutlineProfile className={`mx-${showChatArea?5:6} text-xl text-yellow-500`}/>
+          <FaUserSecret className={`mx-${showChatArea?5:6} text-xl text-blue-500`}/>
+          <FaUserFriends onClick={getFriends} className={`mx-${showChatArea?3:6} text-xl text-gren-500 cursor-pointer`}/>
+        </div>
+        <div className="h-full w-fit flex items-center">
+          <BsGearWideConnected className={`mx-${showChatArea?5:6} text-xl text-gray-500`}/>
+          <BsBoxArrowInRight onClick={handleLogout} className={`mx-${showChatArea?5:6} text-xl text-red-500 cursor-pointer`}/>
+        </div>
+      </div>
 
-        <div className='w-full min-h-min h-14 border-b border-slate-700 flex justify-between items-center'>
+      <div className='h-full flex flex-grow flex-col'>
+        {/* search bar */}
+        <div className='w-full min-h-min h-14 border-b border-slate-700 sm:flex hidden justify-between items-center'>
           <div className='w-96 h-full flex justify-center items-center'>
             <button onClick={handleSearchClick} className='h-2/3 aspect-square mx-1 flex justify-center items-center cursor-pointer'><BsSearch/></button>
             <input onChange={handleOnSearch} value={search} className='h-2/3 w-full bg-transparent outline-none text-sm pl-3' placeholder='Search . . .'></input>
           </div>
           <div className='w-fit h-full flex justify-center items-center mr-5'>
-            {/* <div className='h-4/5 aspect-square mx-1 border border-slate-700'></div> */}
             <p>{userData.fName+" "+userData.lName}</p>
             <div className='h-4/5 aspect-square mx-1 border border-slate-700 rounded-full flex items-center justify-center'><FaUserAlt/></div>
           </div>
         </div>
+        {!showChatArea && <div className='w-full min-h-min h-14 border-b border-slate-700 justify-between items-center'>
+          <div className='w-96 h-full flex justify-center items-center'>
+            <button onClick={handleSearchClick} className='h-2/3 aspect-square mx-1 flex justify-center items-center cursor-pointer'><BsSearch/></button>
+            <input onChange={handleOnSearch} value={search} className='h-2/3 w-full bg-transparent outline-none text-sm pl-3' placeholder='Search . . .'></input>
+          </div>
+        </div>}
 
         <div className='flex flex-grow h-full'>
-          <div className='w-96 h-full border-r border-slate-700'>
+          { (!showChatArea || desktopView) && <div className='w-96 h-full border-r border-slate-700'>
             {
               usersArray.map((data)=>{
                 return <Chat clickFunction={()=>{handleNewClick(data)}} key={data._id} name={`${data.fName} ${data.lName}`} status={data.status} lastOnline={data.lastModified}  />
               })
             }
-          </div>
+          </div>}
         
-          
-          <div className='w-[70%] flex-grow h-full flex flex-col justify-between items-center'>
+          {/* chatting area */}
+          {showChatArea && <div className='w-[70%] flex-grow h-full flex flex-col justify-between items-center'>
             <div className='flex items-center w-full border-b border-slate-700 h-14'>
               <div className=' h-2/3 aspect-square ml-2 flex justify-center items-center'><FaUserAlt/></div>
               <div className=' h-5/6 w-fit ml-2'>
                 <p className=''>{currUser.name}</p>
-                {currUser.status===null && <p className='text-xs font-semibold text-slate-600'></p>}
                 {currUser.status===false && <p className='text-xs font-semibold text-slate-600'><span className="text-red-500">Offline</span> . {currUser.lastActive}</p>}
-                {currUser.status===true && <p className='text-xs font-semibold text-green-500'>Online</p>}
+                <div className="flex w-20 justify-between">
+                  {currUser.status===true && <p className='text-xs font-semibold text-green-500'>Online</p>}
+                  {typing2 && <p className="text-xs">Typing...</p>}
+                </div>
               </div>
               <div className='ml-auto flex h-5/6 mr-4'>
-                <div className='h-full mx-1 flex justify-center items-center aspect-square cursor-pointer'><BsFillTelephoneFill/></div>
-                <div className='h-full mx-1 flex justify-center items-center aspect-square cursor-pointer'><BsFillCameraVideoFill/></div>
+                {!showChatArea && <div className='h-full mx-1 flex justify-center items-center aspect-square cursor-pointer'><BsFillTelephoneFill/></div>}
+                {!showChatArea && <div className='h-full mx-1 flex justify-center items-center aspect-square cursor-pointer'><BsFillCameraVideoFill/></div>}
                 <div className='h-full mx-1 flex justify-center items-center aspect-square cursor-pointer'><BsThreeDots/></div>
               </div>
             </div>
             
-            {/* {stream && <video playsInline muted autoPlay ref={myVideo}  className="border w-1/2 h-1/3"></video>}
-            {receivingCall && <div className='h-3/4 max-h-[40rem] flex-grow w-[96%] max-w-6xl my-5 border border-slate-700 p-2 flex justify-center flex-col items-center'>
-              {!callAccepted &&
-                <><span className="mb-10">Video Call from {name}</span>
-                <div className="w-1/2 h-fit flex items-center justify-center">
-                  <button onClick={answerCall} className="h-12 w-1/3 mx-3 border border-slate-600 bg-transparent text-green-500">Accept</button>
-                  <button className="h-12 w-1/3 mx-3 border border-slate-600 bg-transparent text-red-500">Reject</button>
-                  </div></>
-              }
-              {
-                callAccepted && !callEnded &&
-                <>
-                  <video playsInline autoPlay ref={userVideo}  className="border w-2/3 h-2/3"></video>
-                  <button onClick={leaveCall} className="text-red-500 h-10 w-1/6 border mt-5">End Call</button>
-                </>
-              }
-              
-            </div>} */}
+            {msgArray.length===0 && <div className='h-3/4 max-h-[40rem] flex-grow w-[96%] max-w-6xl my-5 border border-slate-700 p-2 flex justify-center items-center'>No new messages</div>}
             
-            {!receivingCall && msgArray.length===0 && <div className='h-3/4 max-h-[40rem] flex-grow w-[96%] max-w-6xl my-5 border border-slate-700 p-2 flex justify-center items-center'>No new messages</div>}
-            
-            {!receivingCall && msgArray.length!==0 && <div ref={chatContainerRef} className='h-3/4 max-h-[40rem] flex-grow w-[96%] max-w-6xl my-5 scroll-smooth border border-slate-700 p-2'>
+            {msgArray.length!==0 && <div ref={chatContainerRef} className='h-3/4 max-h-[40rem] flex-grow w-[96%] max-w-6xl my-5 scroll-smooth border border-slate-700 p-2'>
               {msgArray.map((msgs)=>{
                 if(msgs.text==="image"){
                   return <Messages key={msgs.time} direction={msgs.dir} txt={msgs.text} time={msgs.time} type="i" src={imgURL} />
@@ -362,7 +337,7 @@ const Body = () => {
               <input onChange={handleOnChange} value={text}  className='flex flex-grow h-3/4 bg-transparent outline-0 mx-2 border border-slate-700 px-3' placeholder='Type a message here ...'></input>
               <button disabled={currUser._id.length===0?true:false} type='submit' onClick={handleSend} className='h-3/4 w-fit mr-2 px-4  text-xl outline-none flex justify-center items-center cursor-pointer'><BsSend/></button>
             </form>
-          </div>
+          </div>}
         </div>
 
       </div>

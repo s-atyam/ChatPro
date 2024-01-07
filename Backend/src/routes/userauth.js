@@ -1,39 +1,50 @@
 const express = require('express')
 const router = express.Router();
-
 const user = require('../db/schema/user')
+
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const JWT_SCERET = process.env.JWT_SCERET;
 
 // to create new user (signup)
 router.post('/signup',async (req,res)=>{
     try{
-        const data = await user.find({email:req.body.email});
-        if(data.length>0){
-            res.send({})
+        const data = await user.findOne({email:req.body.email});
+        if(data){
+            res.send({error:'Email already in use'});
+            return;
         }else{
+            const passHash = await bcrypt.hash(req.body.pass,await bcrypt.genSalt(10))
+            req.body.pass = passHash;
+            
             const newUser = new user(req.body);
             await newUser.save()
-            const newData = await user.find({email:req.body.email});
-            res.send(newData[0]);
+
+            const existUser = await user.findOne({email:req.body.email})
+
+            const authToken = jwt.sign({ID:existUser._id},JWT_SCERET);
+            res.send({authToken});
         }
     }catch(e){
         console.log("Error : ",e.message)
-        res.sendStatus(500);
     }
 })
 
 // to login existing user
-router.get('/login', async (req,res)=>{
+router.post('/login', async (req,res)=>{
     try{
-        const data = await user.find({email:req.headers.userid});
-        if(data.length===1){
-            if(data[0].pass===req.headers.pass){
-                res.send(data[0]);
-            }else{
-                res.send({});
-            }
-        }else{
-            res.send({}); 
+        const existUser = await user.findOne({email:req.body.email});
+        if(!existUser){
+            res.send({error:'Wrong credencials'})
+            return;
         }
+        const passwordCompare = await bcrypt.compare(req.body.pass,existUser.pass);
+        if(!passwordCompare){
+          res.send({error:'Wrong credencials'});
+          return;
+        }
+        const authToken = jwt.sign({ID:existUser._id},JWT_SCERET);
+        res.send({authToken});
     }catch(e){
         console.log("Error : ",e.message);
     }

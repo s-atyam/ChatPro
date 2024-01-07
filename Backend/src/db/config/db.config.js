@@ -1,10 +1,11 @@
 const mongoose = require('mongoose')
-const mongoURL = 'mongodb://127.0.0.1:27017/ChatPro'
+const mongoURL = process.env.MONGO_URI
 
 // this function is for connecting to the database
 const connectDB = async () =>{
     try{
-        await mongoose.connect(mongoURL);
+        // console.log(mongoURL)
+        await mongoose.connect(mongoURL,{dbName:'chatpro'});
         console.log("Connected to Database ChatPro(MongoDB)")
     }catch(e){
         console.log(e.message);

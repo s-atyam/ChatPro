@@ -1,11 +1,12 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import logo_dp from '../images/logo.png'
 import { Link, useNavigate } from 'react-router-dom'
 import userContext from '../../context/userContext';
 
+// the signup react funtional component
 const Signup = () => {
     const context = useContext(userContext);
-    const { signup } = context;
+    const { signup, getUserData, token } = context;
 
     const navigate = useNavigate();
 
@@ -14,26 +15,32 @@ const Signup = () => {
     const [password, setPassword] = useState({pass:'',confirm:''});
     const [flag,setFlag] = useState({fName:false,email:false,pass:false,confirm:false})
 
+    // function trigered when, typing the Fname
     const handleChangeFname = (e)=>{
         setName({...name,fName:e.target.value});
         setFlag({...flag,fName:false});
     }
+    // function trigered when, typing the Lname
     const handleChangeLname = (e)=>{
         setName({...name,lName:e.target.value});
     }
+    // function trigered when, typing the Email
     const handleChangeEmail = (e)=>{
         setEmail(e.target.value);
         setFlag({...flag,email:false});
     }
+    // function trigered when, typing the Email
     const handleChangePassword = (e)=>{
         setPassword({...password,pass:e.target.value});
         setFlag({...flag,pass:false});
     }
+    // function trigered when, typing the Confirm Password
     const handleChangeConfirmPass = (e)=>{
         setPassword({...password,confirm:e.target.value});
         setFlag({...flag,confirm:false});
     }
-
+    
+    // function trigered when, clicked on the SUBMIT button
     const handleClick = async (e)=>{
         e.preventDefault();
         const validEmailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
@@ -55,22 +62,21 @@ const Signup = () => {
             return;
         }
         
-        let data = await signup({name,email,password});
-        if(Object.keys(data).length===0){
-            console.log("New User not Created")
-        }else{
+        const userData = await signup({name,email,password});
+        if(Object.keys(userData).length>0){
             navigate('/user');
+        }else{
+            console.log(token,"New User not Created")
+
         }
-    }
-
-
+    }    
 
   return (
     <div className='h-screen w-screen bg-slate-900 flex justify-center items-center text-slate-400 flex-col'>
         <div className="w-2/3 md:w-1/6 flex mb-10">
             <img src={logo_dp} alt="" />
         </div>
-        <form className='w-11/12 md:w-1/3 md:h-7/12 py-10 border-2 border-slate-700 rounded-md flex justify-center items-center flex-wrap'>
+        <form className='w-11/12 sm:w-1/2 lg:w-1/3 h-fit py-10 border-2 border-slate-700 rounded-md flex justify-center items-center flex-wrap'>
             <div className='w-11/12 h-fit flex flex-wrap mb-4 md:mb-0 '>
                 <div className='w-full md:w-[48%] h-fit flex flex-col mr-auto'>
                     <label className='text-sm mb-1'>FIRST NAME *</label>
@@ -110,9 +116,8 @@ const Signup = () => {
                 </div>
             </div>
             <div className='w-11/12 h-fit flex justify-center flex-wrap md:mt-5'>
-                <Link to='/' className=' border text-sm font-semibold px-12 md:px-16 py-2 md:py-1  rounded-sm mx-auto border-slate-300 text-slate-300'>Back</Link>
-                <button onClick={handleClick} className=' border text-sm font-semibold px-12 md:px-16 py-2 md:py-1  rounded-sm mx-auto border-blue-600 text-blue-600'>Submit</button>
-                
+                <Link to='/' className=' border text-sm font-semibold px-12 py-2 md:py-1  rounded-sm mx-auto border-slate-300 text-slate-300'>Back</Link>
+                <button onClick={handleClick} className=' border text-sm font-semibold px-12 py-2 md:py-1  rounded-sm mx-auto border-blue-600 text-blue-600'>Submit</button>
             </div>
         </form>
         <p className='font-semibold text-md mt-10'>Already a user? <Link to='/login' className='text-green-600 cursor-pointer'>Login</Link></p>

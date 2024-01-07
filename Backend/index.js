@@ -1,9 +1,10 @@
 // importing different modules
 const express = require('express');
+require('dotenv').config();
 const http = require('http');
 const cors = require('cors');
 const { Server } = require("socket.io");
-const { writeFile } = require('fs')
+// const { writeFile } = require('fs')
 const os = require('os');
 const user = require('./src/db/schema/user')
 const msg = require('./src/db/schema/message');
@@ -19,10 +20,6 @@ const io = new Server(server, {
         origin: '*'
     }
 });
-// getting current machine ip address
-const localIPAddress = Object.values(os.networkInterfaces())
-.flat()
-.find((info) => info.family === 'IPv4' && !info.internal)?.address;
 
 // connecting to database
 connectDB();
@@ -52,17 +49,39 @@ io.on('connection', async (socket)=>{
     await user.findByIdAndUpdate(customSocketId,{"status":true})
     
     // when the current user gets online/connected to server then sending this status to all his friends
-    {
-        const userData = await user.findById(customSocketId);
-        let socketIDArray = []
-        const promises = userData.friends.map((element)=>{
-            if(user_soc_id.has(element)){
-                socketIDArray.push(user_soc_id.get(element));
+    const userData = await user.findById(customSocketId);
+    let socketIDArray = []
+    const promises = userData.friends.map((element)=>{
+        if(user_soc_id.has(element)){
+            socketIDArray.push(user_soc_id.get(element));
+        }
+    })
+    await Promise.all(promises);
+    socket.to(socketIDArray).emit('status_on_conn',customSocketId);
+
+    // this sokcet instance is when user start typing
+    socket.on('sTyping', async (userID)=>{
+        try {
+            if(user_soc_id.has(userID)){
+                const sockID = user_soc_id.get(userID);
+                socket.to(sockID).emit('typingS');
             }
-        })
-        await Promise.all(promises);
-        socket.to(socketIDArray).emit('status_on_conn',customSocketId);
-    }
+        } catch (error) {
+            console.log(error.message);
+        }
+    })
+    // this sokcet instance is when user stop typing
+    socket.on('eTyping', async (userID)=>{
+        try {
+            if(user_soc_id.has(userID)){
+                const sockID = user_soc_id.get(userID);
+                socket.to(sockID).emit('typingE');
+            }
+        } catch (error) {
+            console.log(error.message);
+        }
+    })
+    
 
     // this socket instance is for when user is sending message
     socket.on('send_message', async (text_data,userID,isFriend,isFile)=>{
@@ -133,6 +152,7 @@ io.on('connection', async (socket)=>{
 
     // this instance when the user logged out or disconnected from the user
     socket.on("disconnect", async () => {
+        // TODO : disconnecting status
         console.log("User Disconnected with id : ",socket.id);
         try{
             soc_user_id.delete(socket.id);
@@ -150,6 +170,6 @@ server.listen(PORT,(e)=>{
     if(e){
         console.log("Server error: ",e);
     }else{
-        console.log(`Server Listening on ${localIPAddress}:${PORT}`)
+        console.log(`Server Listening on ${PORT}`)
     }
 })  
