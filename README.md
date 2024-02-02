@@ -14,6 +14,7 @@ Setup and Run Locally
 2. Install dependencies for both the server and client
 
 // for frontend
+`cd Frontend`
 `npm install`
     
 // for backend
@@ -38,6 +39,7 @@ Also on client side create a .env file and a variable:
 `npm start`
 
 2. Start the client, open another terminal in ChatPro directory and
+`npm Frontend`
 `npm start`
 
 3. Open your browser and go to http://localhost:3000
