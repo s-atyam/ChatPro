@@ -4,7 +4,6 @@ require('dotenv').config();
 const http = require('http');
 const cors = require('cors');
 const { Server } = require("socket.io");
-// const { writeFile } = require('fs')
 const os = require('os');
 const user = require('./src/db/schema/user')
 const msg = require('./src/db/schema/message');
@@ -84,55 +83,24 @@ io.on('connection', async (socket)=>{
     
 
     // this socket instance is for when user is sending message
-    socket.on('send_message', async (text_data,userID,isFriend,isFile)=>{
+    socket.on('send_message', async (text_data,userID,isFriend)=>{
         try{
             let status = false;
             if(user_soc_id.has(userID)){
                 const sockID = user_soc_id.get(userID);
-                socket.to(sockID).emit('recv-message',text_data,isFile);
+                socket.to(sockID).emit('recv-message',text_data);
                 status = true;
             }
-            if(!isFile){
-                const newMsg = new msg({"senderID":customSocketId,"reciverID":userID,"messages":text_data,"status":status});
-                newMsg.save();
-                if(!isFriend){
-                    await user.findByIdAndUpdate(customSocketId,{ $push: { "friends": userID }})
-                }
+            const newMsg = new msg({"senderID":customSocketId,"reciverID":userID,"messages":text_data,"status":status});
+            newMsg.save();
+            if(!isFriend){
+                await user.findByIdAndUpdate(customSocketId,{ $push: { "friends": userID }})
             }
-            // else{
-            //     writeFile("/home/user/temp.jpg", text_data, (err) => {
-            //         if(err){
-            //           console.log("error: ",err.message)
-            //         }
-            //       });
-            // }
+            // BUG : if user not replied then it will not add to the friends array
         }catch(e){
             console.log("Error: ",e.message)
         }
     })
-    // this intance is when the user call
-    socket.on("callUser", (data) => {
-        try{
-            if(user_soc_id.has(data.userid)){
-                const sockID = user_soc_id.get(data.userid);
-                socket.to(sockID).emit('callUser',{ signal: data.signalData, name: data.name});
-            }
-        }catch(e){
-            console.log(e.message)
-        }
-	})
-    
-    // this intance is when the user answers the call
-	socket.on("answerCall", (data) => {
-        try{
-            if(user_soc_id.has(data.userid)){
-                const sockID = user_soc_id.get(data.userid);
-                socket.to(sockID).emit('callAccepted',data.signal);
-            }
-        }catch(e){
-            console.log(e.message)
-        }
-	})
 
     // this instance to send updated status of the user to his friends
     socket.on('dis_status', async ()=>{

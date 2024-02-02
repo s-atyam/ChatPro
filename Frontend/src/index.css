@@ -1,0 +1,135 @@
+@import url('https://fonts.googleapis.com/css2?family=Raleway:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+*{
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter','Raleway', sans-serif;
+  overflow-x: hidden;
+  box-sizing: border-box; 
+}
+::-webkit-scrollbar { 
+  width: 3px;
+} 
+::-webkit-scrollbar-track { 
+  background: transparent; 
+} 
+::-webkit-scrollbar-thumb { 
+  background: rgb(102, 166, 255);
+  border-radius: 10px;
+}
+
+:root{
+  --bright-red: #DE354C;
+  --green-color: #54c535;
+  --blue: #0f4a94;
+  --blue-gray: #273a50;
+  --cloud: #e0e0e0;
+  --light-blue-color: #47d1ff;
+  --gray-color: #757575;
+  --dark-gray-color: #474747;
+  --black-color: #191919;
+}
+
+.gradient {
+  z-index: -2;
+  background-image:
+    radial-gradient(at 97% 21%, rgb(26, 0, 159) 0px, transparent 50%),
+    radial-gradient(at 52% 99%, rgb(45, 206, 255) 0px, transparent 50%),
+    radial-gradient(at 10% 29%, rgb(17, 234, 205) 0px, transparent 50%),
+    radial-gradient(at 97% 96%, rgb(42, 49, 250) 0px, transparent 50%),
+    radial-gradient(at 33% 50%, hsla(222, 67%, 73%, 1) 0px, transparent 50%),
+    radial-gradient(at 79% 53%, rgb(195, 127, 235) 0px, transparent 50%);
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  filter: blur(100px) saturate(150%);
+  opacity: 0.15;
+}
+
+/* containers css */
+.main_container_1{
+  @apply w-screen h-screen
+}
+.main_container_2{
+  @apply w-11/12 md:w-5/6 h-fit
+}
+.main_container_3{
+  @apply w-full h-fit
+}
+.main_container_fit{
+  @apply h-fit w-fit
+}
+.main_container_1, .main_container_2, .main_container_3, .main_container_fit{
+  /* background-color: var(--cloud); */
+}
+
+/* flex css */
+.flex_center{
+  @apply flex justify-center items-center
+}
+.flex_between{
+  @apply flex justify-between items-center
+}
+.flex_evenly{
+  @apply flex justify-evenly items-center
+}
+.flex_around{
+  @apply flex justify-around items-center
+}
+
+.heading_1{
+  @apply text-5xl text-gray-600
+}
+.heading_4{
+  @apply text-xl text-gray-600
+}
+.heading_2{
+  @apply text-sm text-gray-600
+}
+.heading_3{
+  @apply text-xs text-gray-400 font-semibold
+}
+
+.button_1{
+  @apply px-4 py-1 h-fit text-sm font-medium rounded cursor-pointer;
+  transition: all 0.3s;
+  border: 1px solid var(--cloud);
+  color: var(--dark-gray-color);
+}
+
+.primary{
+  background-color: var(--blue);
+  color: var(--cloud);
+}
+.secondary{
+  background-color: var(--green-color);
+}
+
+.neoShadow{
+  box-shadow:  5px 5px 15px #bebebe,-5px -5px 15px #ffffff;
+}
+.neoShadow_1{
+  box-shadow:  3px 3px 4px #bebebe,-3px -3px 4px #ffffff;
+}
+
+.inputField{
+  @apply outline-none text-xs bg-transparent border border-gray-300 font-medium rounded-sm;
+}
+.mHide{
+  @apply lg:flex hidden
+}
+.mShow{
+  @apply lg:hidden flex
+}
+.aHide{
+  @apply hidden
+}
+.chatBackground{
+  background: url('./assets/images/background.svg');
+  background-size: 70%;
+  background-repeat: repeat;
+}

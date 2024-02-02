@@ -8,7 +8,7 @@ const user = require('../db/schema/user')
 router.get('/getUserData',fetchuser, async (req,res)=>{
     try{
         const data = await user.findOne({_id:req.userID}).select('-pass');
-        res.send(data);
+        res.status(200).send(data);
     }catch(e){
         console.log("Error : ",e.message);
     }
