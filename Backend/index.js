@@ -39,6 +39,9 @@ app.use('/profile',require('./src/routes/userprofile'))
 const soc_user_id = new Map();
 const user_soc_id = new Map();
 
+app.get('/',(req,res)=>{
+    res.send('Hello world')
+})
 // different socket intances
 
 // this 'connection' intance is when a user is connected to server via socket intance
