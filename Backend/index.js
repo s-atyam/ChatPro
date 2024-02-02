@@ -24,7 +24,13 @@ const io = new Server(server, {
 connectDB();
 
 app.use(express.json());
-app.use(cors())
+app.use(cors(
+    {
+        origin:['https://chat-pro-react.netlify.app'],
+        methods: ['POST','GET','PUT','DELETE'],
+        credentials: true
+    }
+))
 
 app.use('/auth',require('./src/routes/userauth'))
 app.use('/profile',require('./src/routes/userprofile'))
